@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAF Palette</title>
+    <meta name="description" content="Simple theme editor for FAF Client">
+    <link rel="shortcut icon" href="favicon.png" type="image/png">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+
+    <link rel="stylesheet/less" type="text/css" href="style.less" />
+    <script src="https://cdn.jsdelivr.net/npm/less" ></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.8/dist/vue.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/dedent@0.7.0/dist/dedent.min.js"></script>
+
+    <script src="presets.js"></script>
+
+</head>
+<body>
+    <div id="app" class="app">
+
+        <h1>FAF Palette</h1>
+        <p>Simple theme editor for <a href="https://www.faforever.com/">FAF Client</a></p>
+
+        <div class="preview">
+            <div class="nav">
+                <span class="active">Menu1</span><span>Menu2</span>
+            </div>
+            <div class="body">
+                <div :class="{search:true, active: preview.search}" @click="preview.search = !preview.search">PLAY FAF</div>
+                <div class="buttons">
+                    <div>
+                        <div class="button active">1v1</div>
+                        <div class="text">
+                            <span>time</span><span :class="{active:theme.mods.queue}">queue</span><span>active</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="button">2v2</div>
+                        <div class="text">
+                            <span>time</span><span :class="{active:theme.mods.queue}">queue</span><span>active</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="button active">3v3</div>
+                        <div class="text">
+                            <span>time</span><span :class="{active:theme.mods.queue}">queue</span><span>active</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="button">4v4</div>
+                        <div class="text">
+                            <span>time</span><span :class="{active:theme.mods.queue}">queue</span><span>active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <details class="presets" open>
+            <summary>Colors presets</summary>
+            <div class="list">
+                <div class="preset" v-for="(preset, index) in presets" @click="setPreset(preset)" :title="index">
+                    <span :style="{backgroundColor:preset.accent}"></span>
+                    <span :style="{backgroundColor:preset.background}"></span>
+                    <span :style="{backgroundColor:preset.search}"></span>
+                </div>
+            </div>
+            <button @click="downloadPresets()">Download all preset themes one click</button>
+        </details>
+
+        <div class="theme">
+            <div class="colors">
+                <div class="grid">
+                    <label class="color"><span>accent</span><input type="color" v-model="theme.colors.accent"></label>
+                    <label class="color"><span>background</span><input type="color" v-model="theme.colors.background"></label>
+                    <label class="color"><span>color</span><input type="color" v-model="theme.colors.color"></label>
+                </div>
+                <div class="grid">
+                    <label class="color"><span>search</span><input type="color" v-model="theme.colors.search"></label>
+                </div>
+            </div>
+            <div class="mods">
+                <label><input type="checkbox" v-model="theme.mods.queue"> Highlight queue column</label>
+            </div>
+            <hr>
+            <div :class="{properties:true, expanded: this.properties_expanded}">
+                <label class="always">
+                    Display name
+                    <input type="text" v-model="theme.properties.displayName">
+                </label>
+
+                <a href="#" class="more" @click="properties_expanded = true">More ...</a>
+
+                <label>
+                    Author
+                    <input v-model="theme.properties.author">
+                </label>
+                
+                <label>
+                    Compatibility Version
+                    <input v-model="theme.properties.compatibilityVersion">
+                </label>
+
+                <label>
+                    Theme version
+                    <input v-model="theme.properties.themeVersion">
+                </label>
+            </div>
+        </div>
+        <div class="file">
+            <button @click="download()">Download</button>
+        </div>
+        <hr>
+        <div class="help">
+            <h2>How to install theme</h2>
+            <p>Download theme zip file and unpack theme directory to <strong>FAForever/themes/</strong>.</p>
+            <p>For find FAForever directory, in FAF Client click <strong>main menu -> Show data folder</strong></p>
+            <p>After client must be restarted.</p>
+            <p>Go <strong>main menu -> Setting</strong>. Next <strong>Appearance</strong> tab and select your new theme.</p>
+            <h2>How to set background image</h2>
+            <p>In FAF client <strong>main menu -> Setting -> Appearance -> Background image</strong> and choose image file.</p>
+            <h2>What about light themes?</h2>
+            <p>Creating themes with a light background and dark text is complicated by the fact that many colors are hardcoded in the client code to fit the standard dark theme.
+                If on the matchmaking tab with a light theme everything will look tolerable, then on other tabs you can meet white text on a light background and other inconsistencies.
+                If desired, all problems can be circumvented by adding functionality in this theme editor, but it seems that this should be better solved in the code of the client itself.</p>
+            <h2>Links</h2>
+            <p>Source code: <a href="https://github.com/kazinakfaf/fafpalette">kazinakfaf/fafpalette</a></p>
+            <p>Discord: KaziNak#5758</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
